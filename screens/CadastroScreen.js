@@ -1,27 +1,46 @@
-import * as React from 'react';
-import { View, Text, Button, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput  } from 'react-native';
+import { AntDesign } from '@expo/vector-icons'; 
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "./Firebase.js";
+
+
 
 function CadastroScreen({navigation}) {
-    const handleHome = () => {
-        navigation.navigate('Home');
-      };
-  return (
-  <View style={{ backgroundColor: "#DFDEE0", flex: 1, alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', }}>
-    <Text style={styles.titulo}> Cadastro do Usuário</Text>
-        <TextInput style={styles.input} placeholder="Nome"/>
-        <TextInput style={styles.input} placeholder="E-mail"/>
-        <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true}/>
-        <TextInput style={styles.input} placeholder="Repetir Senha" secureTextEntry={true}/>
-        <TextInput style={styles.input} placeholder="CPF"/>
-        <TextInput style={styles.input} placeholder="Telefone"/>
 
-        <TouchableOpacity style={styles.botaoCadastro} onPress={handleHome}>
-            <Text style={styles.textoBotao}>Cadastrar</Text>
-        </TouchableOpacity>
-  </View>
-  );
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleHome = () => {
+      navigation.navigate('Login');
+  };
+
+  const handleCadastro = async () => {
+      createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+          alert('Usuário cadastrado com sucesso! ');
+          navigation.navigate('Home');
+      })
+      .catch((error) => {
+          console.log('Erro ao cadastrar usuário!' + error);
+          alert('Erro ao cadastrar usuário! ');
+      });
+  };
+
+return (
+<View style={{ backgroundColor: "#DFDEE0", flex: 1, alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', }}>
+      <View style={styles.boxTitulo}>
+          <AntDesign style={styles.titulo} name="arrowleft" size={34} color="black" onPress={handleHome}/>
+          <Text style={styles.titulo}>Criar conta</Text>
+      </View>
+      <TextInput style={styles.input} placeholder="E-mail" onChangeText={(text) => setEmail(text)}/>
+      <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true} onChangeText={(text) => setPassword(text)}/>
+
+      <TouchableOpacity style={styles.botaoCadastro} onPress={handleCadastro}>
+          <Text style={styles.textoBotao}>Salvar</Text>
+      </TouchableOpacity>
+</View>
+);
 }
 
 const styles = StyleSheet.create({

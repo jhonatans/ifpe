@@ -1,96 +1,80 @@
-import * as React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { FlatList } from 'react-native-web';
-import {  Header, Icon  } from 'react-native-elements';
-import { AntDesign } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image  } from 'react-native';
+import { AntDesign } from '@expo/vector-icons'; 
+import axios from 'axios';
+import { useIsFocused } from "@react-navigation/native";
+import {signOut } from "firebase/auth";
+import { auth } from "./Firebase.js";
 
-function HomeScreen2({navigation}) {
-    const handleHome = () => {
-        navigation.navigate('Rota');
+
+function HomeScreen2({route,navigation}) {
+    const [getData, setData] = useState([]);
+    const isFocused = useIsFocused();
+    
+    const logOutUser = () => {
+      signOut(auth).then(() => {
+        alert('Usuário deslogado com sucesso! ');
+        navigation.navigate('Login');
+        }).catch((error) => {
+          console.log(error); 
+        });
     };
+    
+      useEffect(()=>{    
+        async function consultarDados(){
+          axios.get('https://644c548917e2663b9d049ecb.mockapi.io/cliente/')          
+          .then(function (response) {
+            setData(response.data);
+          }).catch(function (error) {
+            console.log(error);      
+          });      
+        }
+        consultarDados();
+      }, [isFocused])  
 
 
-    return (    
-        <View style={styles.container.FlatList}>
-           <View style={styles.boxTitulo}>
-                 
-                <Text style={styles.tituloRota}>Lista de Contatos</Text>
-                <TouchableOpacity onPress={ () =>  navigation.navigate('RotaContato')}>
-                  <AntDesign stylename="plus" size={24} color="black"/>
-                </TouchableOpacity>                
-            </View>       
-           
-           
-            <View style={styles.box}>
-                <View style={styles.inner}>
-                <TouchableOpacity onPress={ () =>  navigation.navigate('Editor')}>
-                <Image source={require('../figuras/icone.png')}style={{width: 40, height: 40, alignItems: 'left',
+        const handleCadastroContato = () => {
+            navigation.navigate('RotaContato');
+          };
+          const handleEditContato = () => {
+            navigation.navigate('Editor');
+          };
+          return (    
+            <View style={styles.container}>
+              <View style={styles.boxTitulo}>
+                  <Text style={styles.tituloRota}>Lista de Contatos</Text>
+                  <TouchableOpacity onPress={handleCadastroContato}>
+                    <AntDesign style={styles.titulo} name="plus" size={20} color="black" />
+                  </TouchableOpacity> 
+
+                  <TouchableOpacity onPress={logOutUser} alignItems="right">
+                      <Text style={styles.titulo}>Sair</Text>
+                  </TouchableOpacity>
+
+             
+
+              </View>
+
+
+                  {
+                    getData.map((linha, i) => (
+                      <View style={styles.box} >
+                        <View style={styles.inner} >
+                        <TouchableOpacity onPress={()=>navigation.navigate('Editor',{id:linha.id})}>
+                        <Image source={require('../figuras/icone.png')}style={{width: 40, height: 40, alignItems: 'left',
                             justifyContent: 'left',borderWidth: 1, borderRadius: 25,}}/>
-                    <Text style={styles.textoDivs}>Nilson Professor</Text>
-                    <Text style={styles.descricaoEmAndamento}>(81) 98800-0000</Text>
-                    </TouchableOpacity>
-                </View>
+                            <Text style={styles.textoDivs}>{linha.nome}</Text>
+                            <Text style={styles.descricaoEmAndamento}>{linha.telefone}</Text>
+                        </TouchableOpacity>                       
+                        </View>
+                      </View>                    
+                      
+                    ))
+                  }                       
             </View>
-          
+         );
+
         
-            <View style={styles.box}>
-                <View style={styles.inner}>
-                <TouchableOpacity onPress={ () =>  navigation.navigate('Editor')}>
-                <Image source={require('../figuras/icone.png')}style={{width: 40, height: 40, alignItems: 'left',
-                            justifyContent: 'left',borderWidth: 1, borderRadius: 25,}}/>
-                    <Text style={styles.textoDivs}>Jhonathan Rennan</Text>
-                    <Text style={styles.descricaoEmAndamento}>(81) 99800-6666</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-
-            <View style={styles.box}>
-                <View style={styles.inner}>
-                <TouchableOpacity onPress={ () =>  navigation.navigate('Editor')}>
-                <Image source={require('../figuras/icone.png')}style={{width: 40, height: 40, alignItems: 'left',
-                            justifyContent: 'left',borderWidth: 1, borderRadius: 25,}}/>
-                    <Text style={styles.textoDivs}>Renato Rosa</Text>
-                    <Text style={styles.descricaoEmAndamento}>(81) 98675-1901</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-            <View style={styles.box}>
-                <View style={styles.inner}>
-                <TouchableOpacity onPress={ () =>  navigation.navigate('Editor')}>
-                <Image source={require('../figuras/icone.png')}style={{width: 40, height: 40, alignItems: 'left',
-                            justifyContent: 'left',borderWidth: 1, borderRadius: 25,}}/>
-                    <Text style={styles.textoDivs}>Marcos Rennan</Text>
-                    <Text style={styles.descricaoEmAndamento}>(81) 99876-0000</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-
-            <View style={styles.box}>
-                <View style={styles.inner}>
-                <TouchableOpacity onPress={ () =>  navigation.navigate('Editor')}>
-                <Image source={require('../figuras/icone.png')}style={{width: 40, height: 40, alignItems: 'left',
-                            justifyContent: 'left',borderWidth: 1, borderRadius: 25,}}/>
-                    <Text style={styles.textoDivs}>Alfredo Andrade</Text>
-                    <Text style={styles.descricaoEmAndamento}>(81) 98115-6008</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-            <View style={styles.box}>
-                    
-                <View style={styles.inner}>
-                <TouchableOpacity onPress={ () =>  navigation.navigate('Editor')}>
-                <Image source={require('../figuras/icone.png')}style={{width: 40, height: 40, alignItems: 'left',
-                            justifyContent: 'left',borderWidth: 1, borderRadius: 25,}}/>
-                    <Text style={styles.textoDivs}>José da Silva</Text>
-                    <Text style={styles.descricaoEmAndamento}>(81) 93344-5589</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-         </View>
-          
-          
-    );
 }
 const styles = StyleSheet.create({
     container:{
@@ -121,7 +105,7 @@ const styles = StyleSheet.create({
     },
     boxTitulo:{
       width: '100%',
-      height: '12%',
+      height: '20%',
       padding: 18,
     },
     boxRota:{
@@ -142,10 +126,12 @@ const styles = StyleSheet.create({
     titulo:{
         fontWeight: 'bold',
         fontSize: 18
+        
     },
     tituloRota:{
         fontWeight: 'bold',
         fontSize: 18,
+        marginRight: '15%',
     },
    
     header:{
@@ -155,6 +141,14 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       backgroundColor: '#DFDEE0',
     },
+    titulo:{
+      fontWeight: 'bold',
+      marginRight: 15,
+      fontSize: 15,
+      paddingTop: 5
+
+    },
+    
 });
 
 export default HomeScreen2;

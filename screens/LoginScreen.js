@@ -1,19 +1,33 @@
-import * as React from 'react';
+import React, {useState} from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "./Firebase.js";
+
+
 
 function LoginScreen({navigation}) {
+  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   const handleLogin = () => {
-    navigation.navigate('Home');
+    signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      alert('Usuário logado com sucesso! ');
+      console.log('Usuário logado com sucesso!', userCredential.user.uid);
+      navigation.navigate('Home');
+      const user = userCredential.user;
+    })
+    .catch((error) => {
+      alert('Usuário não existe no sistema!');
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    });
   };
-
-
 
   const handleCadastro = () => {
     navigation.navigate('Cadastro');
   };
-  
   return (
       
   <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -26,12 +40,18 @@ function LoginScreen({navigation}) {
 
       <TextInput
         style={styles.input}
-        placeholder="E-mail"/>
+        placeholder="E-mail"
+        onChangeText={(text) => setEmail(text)}
+      />
+
       <TextInput
         style={styles.input}
         placeholder="Senha"
         secureTextEntry={true}
+        onChangeText={(text) => setPassword(text)}
       />
+
+
       <TouchableOpacity style={styles.botao} onPress={handleLogin}>
         <Text style={styles.textoBotao}>Login</Text>
       </TouchableOpacity>
